@@ -1,0 +1,136 @@
+
+# Secure TCP Guessing Game – ENCS5121 Project
+
+**Author:** Osama Zeidan | 1210601
+**Course:** ENCS5121 – Information Security and Computer Networks Lab  
+**Date:** April 20, 2025  
+
+---
+
+## Overview
+
+This project is a secure client-server guessing game implemented in Python. It uses **TCP sockets over SSL/TLS encryption** to protect all communication. The server randomly generates a number between 1 and 100, and the client connects, guesses the number, and receives feedback: _Higher_, _Lower_, or _Correct_.
+
+---
+
+## Functionality Breakdown
+
+### `server_ssl.py` (runs on Windows)
+- Creates a secure SSL server socket listening on port `12345`
+- Accepts multiple clients (via threads)
+- Sends a menu to the client:
+  ```
+  1. Start a new guessing game
+  2. Exit
+  ```
+- If the user chooses option 1:
+  - Server picks a random number between 1–100
+  - Client guesses, server responds "Higher", "Lower", or "Correct"
+- Logs every action (connect, guess, disconnect) into `log.txt`
+- Encrypts the entire session using TLS
+
+### `client_ssl.py` (runs on Kali VM or any client)
+- Connects securely to the server's IP and port 12345
+- Accepts self-signed certificates (`CERT_NONE`)
+- Displays the menu and plays the game interactively
+- Handles encrypted input/output communication with server
+
+---
+
+## SSL/TLS Certificate Generation
+
+To enable secure communication, a self-signed certificate and private key must be created:
+
+```bash
+openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout key.pem
+```
+
+- `cert.pem`: public certificate used by the server
+- `key.pem`: private key used to decrypt session keys
+
+These files must be placed **in the same folder** as `server_ssl.py`.
+
+---
+
+## How to Run the Project
+
+### **Windows Host (Server)**
+
+1. Install Python from [https://python.org](https://python.org)  
+2. Open PowerShell or CMD  
+3. Navigate to your project folder  
+4. Start the server:
+   ```bash
+   python server_ssl.py
+   ```
+
+### ▶️ On **Kali VM (Client)**
+
+1. Open a terminal  
+2. Navigate to project folder  
+3. Start the client:
+   ```bash
+   python3 client_ssl.py
+   ```
+4. When prompted, enter the **Windows IP address** (e.g., `192.168.1.50`)
+
+---
+
+## 🔥 Sample Firewall Rule for Windows
+
+To allow Kali to connect to Windows server over port 12345:
+
+```powershell
+New-NetFirewallRule -DisplayName "Allow Python SSL Server" `
+  -Direction Inbound -Protocol TCP -LocalPort 12345 `
+  -Action Allow
+```
+
+---
+
+## Project Folder Structure
+
+```
+GuessingGameSSL/
+├── server_ssl.py
+├── client_ssl.py
+├── cert.pem
+├── key.pem
+├── log.txt             # Created automatically
+└── README.txt
+```
+
+---
+
+## 📝 Notes
+
+- This project uses **SSLContext with CERT_NONE**, which allows using a self-signed certificate for testing.
+- In production, you should use a CA-signed certificate and set:
+  ```python
+  context.verify_mode = ssl.CERT_REQUIRED
+  context.check_hostname = True
+  ```
+
+---
+
+## 📜 Log Example (log.txt)
+
+```
+[2025-04-14 18:03:21.101412] Client connected from ('192.168.1.101', 52578)
+[2025-04-14 18:03:29.123091] ('192.168.1.101', 52578) selected option: 1
+[2025-04-14 18:03:31.128943] ('192.168.1.101', 52578) guessed: 45
+[2025-04-14 18:03:37.931239] Disconnected from ('192.168.1.101', 52578)
+```
+
+---
+
+## Project Status
+
+✔ Fully functional  
+✔ Encrypted over TLS  
+✔ Tested on Windows host and Kali VM client  
+✔ Includes logs and client-server interaction  
+
+---
+
+Osama Zeidan

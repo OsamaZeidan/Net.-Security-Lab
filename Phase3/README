@@ -1,0 +1,185 @@
+============================================================
+SECURE GUESSING GAME - PHASE III
+Mutual Authentication + DH Key Exchange + AES-CBC Encryption
+============================================================
+
+[+] COURSE: ENCS5121 – Computer and Network Security
+[+] PROJECT PHASE: III – Secure Communication and Encrypted Gameplay
+[+] AUTHOR: Osama Zeidan - 1210601
+
+------------------------------------------------------------
+DESCRIPTION:
+------------------------------------------------------------
+This project implements a secure client-server guessing game where:
+- Both client and server authenticate each other using RSA signatures.
+- A shared secret key is established using Diffie-Hellman (DH) key exchange.
+- All game messages are encrypted using AES-256 in CBC mode.
+
+This phase finalizes the system's security, integrating mutual trust verification, secure key generation, and encrypted communication.
+
+------------------------------------------------------------
+REQUIREMENTS:
+------------------------------------------------------------
+
+- Python 3.6 or higher
+- Internet connection (localhost only)
+- Required Python libraries:
+    - pycryptodome
+    - Crypto
+    - socket
+    - hashlib
+
+------------------------------------------------------------
+INSTALL DEPENDENCIES:
+------------------------------------------------------------
+
+Run the following command in your terminal or command prompt:
+
+    pip install pycryptodome
+    pip install Crypto
+    pip install socket
+    pip install hashlib
+
+------------------------------------------------------------
+PROJECT FILES:
+------------------------------------------------------------
+
+1. client.py      → Client application with RSA, DH, AES-CBC and gameplay
+2. server.py      → Server application with RSA, DH, AES-CBC and game logic
+3. utils.py       → Cryptographic helper functions used by both client and server
+4. e.py           → to choose 'e' value for RSA key generation
+4. README.txt     → This guide
+
+------------------------------------------------------------
+HOW TO RUN:
+------------------------------------------------------------
+
+Step 1: Open two terminals (or command prompts).
+
+Step 2: In the first terminal, run the server:
+
+    python server.py
+
+You should see output:
+    [*] Server is listening on 0.0.0.0:65432...
+
+Step 3: In the second terminal, run the client:
+
+    python client.py
+
+You should see:
+    [*] Connected to server.
+    [+] Server authenticated.
+    [+] Session key derived successfully.
+    --- MENU ---
+    1. Start a new guessing game
+    2. Exit
+    Choose an option:
+
+Step 4: Type `1` to begin the game. Try guessing the number until you get it right.
+
+------------------------------------------------------------
+TEST CASES:
+------------------------------------------------------------
+
+Test Case 1 – Normal Operation (Run 2 Game Rounds):
+------------------------------------------------------------
+Expected:
+- Successful RSA mutual authentication
+- Display of:
+    - RA and RB (nonces)
+    - A and B (DH public values)
+    - a and b (DH private exponents)
+    - gab (shared secret)
+    - K (AES session key)
+    - IV (random initialization vector for each encrypted message)
+- Game functions correctly with encrypted inputs/outputs
+
+Steps:
+- Run client and server (server first)
+- Complete a game round (choose 1, guess the number)
+- Repeat once more for a second game
+- Observe console output with all values printed
+
+Test Case 2 – Trudy Posing as Bob (Fake Server Key):
+------------------------------------------------------------
+Steps:
+- In `server.py`, modify the RSA private exponent `d` to an incorrect value.
+- Run the client.
+Expected:
+- Client prints: [!] Server authentication failed.
+- Session ends immediately.
+
+Test Case 3 – Trudy Posing as Alice (Fake Client Key):
+------------------------------------------------------------
+Steps:
+- In `client.py`, modify the RSA private exponent `d` to an incorrect value.
+- Run the client.
+Expected:
+- Server prints: [!] Client authentication failed.
+- Connection closed immediately.
+
+------------------------------------------------------------
+TIPS FOR TESTING:
+------------------------------------------------------------
+
+- Run each test case separately.
+- Use print statements already included to observe:
+    - DH parameters and secrets (a, b, A, B, gab)
+    - Session key `K`
+    - Nonces RA, RB
+    - Signature validation results
+    - IVs for AES encryption
+- You can modify the guessing range or logic inside `server.py` if you want to customize the game.
+
+------------------------------------------------------------
+SECURITY HIGHLIGHTS:
+------------------------------------------------------------
+
+- Mutual authentication with RSA digital signatures
+- Ephemeral keys used in DH (a and b change every game round)
+- Fresh AES key per session
+- AES-CBC with random IV per message
+- Proper key destruction and assertions for robustness
+
+------------------------------------------------------------
+TROUBLESHOOTING:
+------------------------------------------------------------
+
+- Make sure client and server files are in the same folder
+- Avoid firewall/antivirus blocking port 65432
+- Ensure reqyired libraries are installed
+- If connection fails, check for errors like:
+    - Signature mismatch
+    - Invalid key generation
+    - Empty messages or socket timeout
+
+------------------------------------------------------------
+NOTES:
+------------------------------------------------------------
+
+- This implementation is designed for **local testing** only (localhost).
+
+--------------------------------------------------------------
+Acronyms:
+--------------------------------------------------------------
+
+| Term                    | Meaning                                              |
+| ----------------------- | ---------------------------------------------------- |
+| **RA / RB**             | Random nonces generated by client and server         |
+| **A / B**               | Public DH values (g^a mod m)                         |
+| **gab**                 | Shared secret (g^ab mod m)                           |
+| **K**                   | AES session key derived from `gab`                   |
+| **SA / SB**             | RSA signatures to prove identity                     |
+| **IV**                  | Initialization Vector used in AES-CBC                |
+| **AES-CBC**             | AES encryption in Cipher Block Chaining mode         |
+| **RSA**                 | Cryptographic algorithm for signing and verification |
+| **DH (Diffie-Hellman)** | Key exchange method to agree on shared secret        |
+
+
+------------------------------------------------------------
+DONE!
+------------------------------------------------------------
+
+[+] Osama Zeidan - 1210601
+[+] ENCS5121 – Computer and Network Security
